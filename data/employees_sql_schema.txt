@@ -1,0 +1,308 @@
+
+CREATE TABLE "assignedTo" (
+	id VARCHAR NOT NULL, 
+	name VARCHAR, 
+	tasks_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(tasks_id) REFERENCES tasks (id)
+)
+
+/*
+3 rows from assignedTo table:
+id	name	tasks_id
+E00001	Shannon Curtis	T732
+E00002	Tommy Parker	T1855
+E00003	Benjamin Archer	T224
+*/
+
+
+CREATE TABLE address (
+	id VARCHAR NOT NULL, 
+	street VARCHAR, 
+	city VARCHAR, 
+	contact_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(contact_id) REFERENCES contact (id)
+)
+
+/*
+3 rows from address table:
+id	street	city	contact_id
+109e633c-090e-4851-853d-3d4569eb37b0	0492 Joe Grove Suite 306	West Michaelview	5c699cd7-7026-454d-bc58-bfd2bc77d767
+333f108e-3b83-4e12-9597-7459fb5d5d6d	1366 Garcia Corners Suite 883	Fostermouth	08f7b02d-191b-4041-bbbd-92acb608d7c1
+ef57d47b-d08c-45ac-a3c1-09b31efcf3fb	461 Paul Landing Apt. 055	West Brittany	37992716-c807-4aca-bfcc-8f90bfd4ac13
+*/
+
+
+CREATE TABLE certifications (
+	id VARCHAR NOT NULL, 
+	experience_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(experience_id) REFERENCES experience (id)
+)
+
+/*
+3 rows from certifications table:
+id	experience_id
+52abe55d-3dba-4c33-b0a9-a16ab36e80b3	7ae2e31b-6215-4050-a781-8141017c1738
+a040ee1c-a362-49af-a80c-670179ce2f07	0e643c12-3a9f-43a5-ac29-e0d7298f4149
+8cf7eb09-c5e4-405e-b425-3f4ea67ea979	15952bc7-ca63-4dd6-8037-57e304b8cc4b
+*/
+
+
+CREATE TABLE contact (
+	id VARCHAR NOT NULL, 
+	email VARCHAR, 
+	phone VARCHAR, 
+	profile_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(profile_id) REFERENCES profile (id)
+)
+
+/*
+3 rows from contact table:
+id	email	phone	profile_id
+5c699cd7-7026-454d-bc58-bfd2bc77d767	robert91@example.com	001-463-586-9672x633	d503e62b-b3ac-40a4-8ab6-ceeaa90ce4c2
+08f7b02d-191b-4041-bbbd-92acb608d7c1	arnoldtheresa@example.com	785.904.8249x81852	1715568f-1898-4176-a1dd-9254157ebdbf
+37992716-c807-4aca-bfcc-8f90bfd4ac13	burnsmark@example.com	+1-548-307-7621x3591	a6146eb6-709f-4a90-b63e-60081d7f276b
+*/
+
+
+CREATE TABLE current (
+	id VARCHAR NOT NULL, 
+	value VARCHAR, 
+	certifications_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(certifications_id) REFERENCES certifications (id)
+)
+
+/*
+3 rows from current table:
+id	value	certifications_id
+38ec566f-4d58-429e-867e-4521b17c125c	AWS Solutions Architect	52abe55d-3dba-4c33-b0a9-a16ab36e80b3
+6bea798f-ffe3-4a09-9929-08670fde9fc7	Scrum Master	52abe55d-3dba-4c33-b0a9-a16ab36e80b3
+b0dd310b-d522-452a-8792-8cdbb7c7468d	AWS Solutions Architect	a040ee1c-a362-49af-a80c-670179ce2f07
+*/
+
+
+CREATE TABLE domains (
+	id VARCHAR NOT NULL, 
+	value VARCHAR, 
+	experience_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(experience_id) REFERENCES experience (id)
+)
+
+/*
+3 rows from domains table:
+id	value	experience_id
+7cbb0a4d-798e-4ec6-b84d-307290bbd353	Healthcare	7ae2e31b-6215-4050-a781-8141017c1738
+4492780b-002d-4de1-a1e8-2db1f1b764b7	E-commerce	7ae2e31b-6215-4050-a781-8141017c1738
+bf364115-6964-466b-b2f0-b3314c95450e	AI	0e643c12-3a9f-43a5-ac29-e0d7298f4149
+*/
+
+
+CREATE TABLE employees (
+	id VARCHAR NOT NULL, 
+	name VARCHAR, 
+	PRIMARY KEY (id)
+)
+
+/*
+3 rows from employees table:
+id	name
+E00001	Shannon Curtis
+E00002	Tommy Parker
+E00003	Benjamin Archer
+*/
+
+
+CREATE TABLE experience (
+	id VARCHAR NOT NULL, 
+	years INTEGER, 
+	skills_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(skills_id) REFERENCES skills (id)
+)
+
+/*
+3 rows from experience table:
+id	years	skills_id
+7ae2e31b-6215-4050-a781-8141017c1738	5	335219d8-f622-40b3-98bf-089e5c9f0510
+0e643c12-3a9f-43a5-ac29-e0d7298f4149	7	358912ee-0a23-41a8-9048-9374684bad63
+15952bc7-ca63-4dd6-8037-57e304b8cc4b	3	88fdbd2a-3296-4b0f-8836-3093dcf82957
+*/
+
+
+CREATE TABLE expired (
+	id VARCHAR NOT NULL, 
+	value VARCHAR, 
+	certifications_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(certifications_id) REFERENCES certifications (id)
+)
+
+/*
+3 rows from expired table:
+id	value	certifications_id
+7df9b7b2-ddc5-4435-8d9e-8853906fb7fe	CompTIA Security+	52abe55d-3dba-4c33-b0a9-a16ab36e80b3
+6bfe64a2-44b0-474d-92bb-49239d556318	Oracle Java SE 8	8cf7eb09-c5e4-405e-b425-3f4ea67ea979
+f2c358c0-006e-4d96-aa56-0f6d1472adc6	Oracle Java SE 8	81135636-731e-40dc-a3f5-4d7136f3f245
+*/
+
+
+CREATE TABLE geo (
+	id VARCHAR NOT NULL, 
+	lat VARCHAR, 
+	long VARCHAR, 
+	location_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(location_id) REFERENCES location (id)
+)
+
+/*
+3 rows from geo table:
+id	lat	long	location_id
+7d5d951a-7283-45dc-8789-5a2f60feb39f	-60.2657	47.3055	5ab9ac8b-9583-4d38-9052-f35db3ce94f4
+50a6307d-a967-43e0-ba76-e80270efc990	-57.5373	42.8824	7c1f6043-79e1-4fdc-8cb8-dc33f1083d5f
+5896f9a0-df1a-49eb-ae2e-ec0117a20d28	-57.4917	23.0076	e0ac747d-9db4-45ce-8688-15a63ed0c690
+*/
+
+
+CREATE TABLE location (
+	id VARCHAR NOT NULL, 
+	state VARCHAR, 
+	country VARCHAR, 
+	address_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(address_id) REFERENCES address (id)
+)
+
+/*
+3 rows from location table:
+id	state	country	address_id
+5ab9ac8b-9583-4d38-9052-f35db3ce94f4	LA	USA	109e633c-090e-4851-853d-3d4569eb37b0
+7c1f6043-79e1-4fdc-8cb8-dc33f1083d5f	VT	USA	333f108e-3b83-4e12-9597-7459fb5d5d6d
+e0ac747d-9db4-45ce-8688-15a63ed0c690	MS	USA	ef57d47b-d08c-45ac-a3c1-09b31efcf3fb
+*/
+
+
+CREATE TABLE meta (
+	id VARCHAR NOT NULL, 
+	verified BOOLEAN, 
+	"lastUpdated" DATE, 
+	certifications_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(certifications_id) REFERENCES certifications (id)
+)
+
+/*
+3 rows from meta table:
+id	verified	lastUpdated	certifications_id
+8b31e0e9-4676-4dd0-8530-b01ec1ac4a01	True	2025-07-22	52abe55d-3dba-4c33-b0a9-a16ab36e80b3
+4e7c320b-96aa-40c2-a9a0-e91cb8b92473	True	2025-04-12	a040ee1c-a362-49af-a80c-670179ce2f07
+dbae38e7-190e-42e2-accf-5c0149293a21	True	2025-01-26	8cf7eb09-c5e4-405e-b425-3f4ea67ea979
+*/
+
+
+CREATE TABLE profile (
+	id VARCHAR NOT NULL, 
+	name VARCHAR, 
+	employees_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(employees_id) REFERENCES employees (id)
+)
+
+/*
+3 rows from profile table:
+id	name	employees_id
+d503e62b-b3ac-40a4-8ab6-ceeaa90ce4c2	None	E00001
+1715568f-1898-4176-a1dd-9254157ebdbf	None	E00002
+a6146eb6-709f-4a90-b63e-60081d7f276b	None	E00003
+*/
+
+
+CREATE TABLE projects (
+	id VARCHAR NOT NULL, 
+	name VARCHAR, 
+	profile_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(profile_id) REFERENCES profile (id)
+)
+
+/*
+3 rows from projects table:
+id	name	profile_id
+P655	Incubate World-Class Schemas	d503e62b-b3ac-40a4-8ab6-ceeaa90ce4c2
+P244	Syndicate Intuitive Convergence	1715568f-1898-4176-a1dd-9254157ebdbf
+P478	Exploit Distributed Web Services	a6146eb6-709f-4a90-b63e-60081d7f276b
+*/
+
+
+CREATE TABLE secondary (
+	id VARCHAR NOT NULL, 
+	value VARCHAR, 
+	skills_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(skills_id) REFERENCES skills (id)
+)
+
+/*
+3 rows from secondary table:
+id	value	skills_id
+d90f14ec-598c-4cca-980a-484c6284326f	AWS	335219d8-f622-40b3-98bf-089e5c9f0510
+ee0978ec-04c4-458c-99b7-ef1c364cf236	Node.js	335219d8-f622-40b3-98bf-089e5c9f0510
+e14d621e-a43d-46d9-ab25-01f46237c9d5	AWS	358912ee-0a23-41a8-9048-9374684bad63
+*/
+
+
+CREATE TABLE skills (
+	id VARCHAR NOT NULL, 
+	"primary" VARCHAR, 
+	"assignedTo_id" VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY("assignedTo_id") REFERENCES "assignedTo" (id)
+)
+
+/*
+3 rows from skills table:
+id	primary	assignedTo_id
+335219d8-f622-40b3-98bf-089e5c9f0510	C++	E00001
+358912ee-0a23-41a8-9048-9374684bad63	JavaScript	E00002
+88fdbd2a-3296-4b0f-8836-3093dcf82957	C++	E00003
+*/
+
+
+CREATE TABLE tasks (
+	id VARCHAR NOT NULL, 
+	description VARCHAR, 
+	projects_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(projects_id) REFERENCES projects (id)
+)
+
+/*
+3 rows from tasks table:
+id	description	projects_id
+T732	Synergistic asynchronous infrastructure	P655
+T1855	Up-sized 4thgeneration methodology	P244
+T224	Self-enabling 4thgeneration infrastructure	P478
+*/
+
+
+CREATE TABLE timezone (
+	id VARCHAR NOT NULL, 
+	name VARCHAR, 
+	utc_offset VARCHAR, 
+	geo_id VARCHAR NOT NULL, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(geo_id) REFERENCES geo (id)
+)
+
+/*
+3 rows from timezone table:
+id	name	utc_offset	geo_id
+075f83a9-9672-4b2a-955f-0faab5480da2	America/Denver	-07:00	7d5d951a-7283-45dc-8789-5a2f60feb39f
+e8de82a2-cf26-4a50-9040-965e35378d08	America/Denver	-07:00	50a6307d-a967-43e0-ba76-e80270efc990
+d97cfdc3-75a4-47b3-a901-2dfe5a6b780e	America/Chicago	-06:00	5896f9a0-df1a-49eb-ae2e-ec0117a20d28
+*/
