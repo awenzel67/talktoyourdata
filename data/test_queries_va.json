@@ -1,0 +1,180 @@
+{
+    "version": "0.0.1",
+    "data": [
+        {
+            "question": "What is the total headcount of staff in the company?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var result=data.employees.length;",
+            "sql_query_ref": "select count(*) from employees",
+            "type": "count"
+        },
+        {
+            "question": "What is the complete list of staff members?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var result=data.employees.map(x=>x.name);",
+            "sql_query_ref": "select name from employees",
+            "type": "count"
+        },
+        {
+            "question": "What are the contact email details for every staff member?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var result=data.employees.map(x=>x.profile.contact.email);",
+            "sql_query_ref": "select email from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id",
+            "type": "count"
+        },
+        {
+            "question": "What is the contact information for staff member Sara Rivera?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\n      var result=data.employees.filter(\nemployee => {\n  return employee.name=='Sara Rivera';\n}\n).map(employee => ({\n    street: employee.profile.contact.address.street,\n    city: employee.profile.contact.address.city\n    })\n    )\n",
+            "sql_query_ref": "select street, city from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id where employees.name='Sara Rivera'",
+            "type": "count"
+        },
+        {
+            "question": "What are the titles of all the projects?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.map(\nemployee => {\n   return employee.profile.projects[0].name\n})\n",
+            "sql_query_ref": "select name from projects",
+            "type": "count"
+        },
+        {
+            "question": "How many total projects are there?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var count_projects=0;data.employees.map(employee => { count_projects=count_projects + employee.profile.projects.length });var result=count_projects;",
+            "sql_query_ref": "select count(*) from projects",
+            "type": "count"
+        },
+        {
+            "question": "Which team member is responsible for the project titled \"Incubate World-Class Schemas\"?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return  project.name=='Incubate World-Class Schemas';\n     } \n  ) \n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )[0]    \n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id where projects.name='Incubate World-Class Schemas'",
+            "type": "count"
+        },
+        {
+            "question": "What are the job responsibilities assigned to team member Tommy Parker?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var tasks=[]; data.employees.filter(emp => emp.name==='Tommy Parker').map(emplo=>{emplo.profile.projects.map(proj=>{proj.tasks.map(task=>tasks.push(task.description))})});var result=tasks;",
+            "sql_query_ref": "select tasks.description from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id where employees.name='Tommy Parker'",
+            "type": "count"
+        },
+        {
+            "question": "Which team member lists JavaScript as their main expertise in the current project?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills && task.assignedTo.skills.primary === \"JavaScript\";\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id where skills.\"primary\"='JavaScript'",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members have prior experience in the Healthcare sector listed in their project history?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.domains && task.assignedTo.skills.experience.domains.some( domain => { return domain == \"Healthcare\"});\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id join domains on experience_id = experience.id  where domains.value='Healthcare'",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members have worked in either the Healthcare or E-commerce sectors during their projects?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.domains && task.assignedTo.skills.experience.domains.some( domain => { return domain == \"Healthcare\" || domain == \"E-commerce\"});\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select distinct employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id join domains on experience_id = experience.id  where domains.value in ('Healthcare','E-commerce')",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members possess project experience in both the Healthcare and E-commerce sectors?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.domains && task.assignedTo.skills.experience.domains.some( domain => { return domain == \"Healthcare\"});\n        });\n     } \n  ) &&\n  employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.domains && task.assignedTo.skills.experience.domains.some( domain => { return domain == \"E-commerce\"});\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id \n where \n exists (\n  select * from  domains where  \n   experience_Id=  experience.Id \n  and value= 'Healthcare'--,'E-commerce')\n )\n and\n exists (\n  select * from  domains where  \n   experience_Id=  experience.Id \n  and value= 'E-commerce'\n )\n",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members have a certification last updated after August 1, 2025?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.certifications.meta && task.assignedTo.skills.experience.certifications.meta.lastUpdated>\"2025-08-01\";\n        });\n     } \n  ) \n}\n).map(employee => ({\n   name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select distinct employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id  join certifications on experience_id=experience.id join meta on certifications_id=certifications.id where lastUpdated>'2025-08-01'",
+            "type": "count"
+        },
+        {
+            "question": "Who are the most senior employees in terms of years of service?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var pname = 0\n        data.employees.map(employee => {\n            employee.profile.projects.map(\n                project => {\n                    project.tasks.map(\n                        task => {\n                            if (task.assignedTo.skills.experience.years > pname) {\n                                pname = task.assignedTo.skills.experience.years\n                            }\n                        }\n                    )\n                }\n            )\n        })\n\n        var employeesFilter = data.employees.filter(\n            employee => {\n                return employee.profile.projects.some(\n                    project => {\n                        return project.tasks.some(task => {\n                            return task.assignedTo.skills.experience && task.assignedTo.skills.experience.years == pname;\n                        });\n                    }\n                )\n            }\n        ).map(employee => \n           {return {\n             \"id\":employee.id,\n             \"name\":employee.name\n           }}\n        )\n\n        return employeesFilter;\n    }\n)[0]\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id where experience.years=(select max(years) from  experience)",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members reside above the 50th parallel?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return Number(employee.profile.contact.address.location.geo.lat)>50.0;\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select employees.name  from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id join location on address_id=address.Id join geo on location_id=location.Id where CAST(geo.lat as REAL) >50",
+            "type": "count"
+        },
+        {
+            "question": "What are the various time zones where the team members are located?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var timezones = new Set();\n        data.employees.map(employee => {\n          let tz = employee.profile.contact.address.location.geo.timezone.name;\n          if (tz){\n              timezones.add(tz);\n          }\n        });\n        return [...timezones];;\n    }\n)[0]\n",
+            "sql_query_ref": "select distinct timezone.name from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id join location on address_id=address.Id join geo on location_id=location.Id join timezone on geo_id=geo.Id  ",
+            "type": "count"
+        },
+        {
+            "question": "Which staff members share an identical time zone?\n(refer to them by name only)",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var timezone_emplyoee = {};\n        data.employees.map(employee => {\n          let tz = employee.profile.contact.address.location.geo.timezone.name;\n          if (!(tz in timezone_emplyoee)){\n              timezone_emplyoee[tz]=[];\n          }\n          timezone_emplyoee[tz].push(employee.name);\n        });\n        return timezone_emplyoee;\n    }\n)[0]\n",
+            "sql_query_ref": "select timezone.name as timezoneName,employees.name as employeesName from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id join location on address_id=address.Id join geo on location_id=location.Id join timezone on geo_id=geo.Id  order by timezone.name,employees.name",
+            "type": "count"
+        },
+        {
+            "question": "Wich domain experience comes up the most?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var domains = {};\n        data.employees.map(employee => {\n          employee.profile.projects.map( \n             project => {\n                project.tasks.map(task => {\n                   if (task.assignedTo.skills.experience.domains)\n                   {\n                      task.assignedTo.skills.experience.domains.map( domain => { \n                          if (! (domain in domains)) {\n                             domains[domain]=0;\n                          }\n                          domains[domain]=domains[domain]+1;\n                      });\n                   }\n                });\n          });\n        });\n\n        var domain_max=\"\";\n        var domain_max_count=0;\n\n        for (key in domains){\n           if (domains[key]>domain_max_count){\n                domain_max=key;\n                domain_max_count=domains[key];\n           }\n        }\n\n\n        return domain_max;\n    }\n)[0]\n",
+            "sql_query_ref": "select value, count(*) as count from domains group by value order by count desc limit 1",
+            "type": "count"
+        },
+        {
+            "question": "What is the count of skills listed for each staff member?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var domains = [];\n        data.employees.map(employee => {\n          var skills=0;\n          employee.profile.projects.map( \n             project => {\n                project.tasks.map(task => {\n                  if (task.assignedTo.skills.primary>''){\n                     skills=skills+1;\n                  }\n                   skills=skills+task.assignedTo.skills.secondary.length;\n                });\n          });\n          domains.push(\n             {\n                \"id\": employee.id,\n                \"name\": employee.name,\n                \"skills\": skills\n             }\n          )\n        });\n        return domains;\n    }\n)[0]   \n",
+            "sql_query_ref": "select name,count(*) as count from( select employees.name, skills.\"primary\"  as skill from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id union select employees.name, secondary.value as skill from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join secondary on skills_id =skills.id) group by name",
+            "type": "count"
+        },
+        {
+            "question": "Which employees possess the skill 'Docker' along with experience in the DevOps field? Provide their IDs and names.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(employee => {\n          return employee.profile.projects.some( \n             project => {\n                 return project.tasks.some(task => {\n                  if (task.assignedTo.skills.primary=='Docker'){\n                     return true;\n                  }\n                  if (task.assignedTo.skills.secondary.includes('Docker')){\n                     return true;\n                  }\n                  return false;\n                }) &&\n                project.tasks.some(task => {\n                   return task.assignedTo.skills.experience.domains && \n                   task.assignedTo.skills.experience.domains.some( domain => { return domain == \"DevOps\"});\n                });\n          });\n    }).map(employee => {\n       return {\n         \"id\": employee.id,\n         \"name\": employee.name\n       }\n    })   \n",
+            "sql_query_ref": "select employees.id, employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join secondary on skills_id =skills.id where  (secondary.value='Docker' or skills.\"primary\"='Docker') and exists( select * from  experience join domains on experience_id=experience.id  where experience.skills_id=skills.id  and domains.value='DevOps')",
+            "type": "count"
+        },
+        {
+            "question": "How many tasks are there in total?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=0;\ndata.employees.map(employee => {\n          employee.profile.projects.map( \n             project => {\n                 result=result+project.tasks.length;\n          })\n    })\n",
+            "sql_query_ref": "select  count(*) from tasks",
+            "type": "count"
+        },
+        {
+            "question": "How many projects are assigned to each employee?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=\ndata.employees.map(employee => {\n          let countprojects=employee.profile.projects.length;\n          return {\n            \"name\": employee.name,\n            \"project\": countprojects\n          }\n    })\n",
+            "sql_query_ref": "select employees.name,count(*) from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id group by employees.name",
+            "type": "count"
+        },
+        {
+            "question": "Which staff member is located closest to the latitude and longitude: 52.52437° N, 13.41053° E?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nlet latref=52.52437; // Breite\nlet longref=13.41053; // Laenge\nlet distance=99999999.0;\nvar result={} \ndata.employees.map(\nemployee => {\n  let dlat=Number(employee.profile.contact.address.location.geo.lat)-latref;\n  let dlong=Number(employee.profile.contact.address.location.geo.long)-longref;\n  let dist=Math.sqrt(dlat*dlat+dlong*dlong);\n  if(dist<distance)\n  {\n    result= {\n    id: employee.id,\n    name: employee.name,\n     };\n     distance=dist;\n  }\n})\n",
+            "sql_query_ref": "select employeesName from(select employees.name as employeesName, geo.lat, geo.long, sqrt( (geo.lat- 52.52437)*(geo.lat- 52.52437)+(geo.long - 13.41053)*(geo.long - 13.41053)) as geodiff from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id join location on address_id=address.Id join geo on location_id=location.Id order by geodiff asc limit 1)",
+            "type": "count"
+        },
+        {
+            "question": "Which city has the highest concentration of workers residing in them?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var city_emplyoee = {};\n        data.employees.map(employee => {\n          let tz = employee.profile.contact.address.city;\n          if (!(tz in city_emplyoee)){\n              city_emplyoee[tz]=[];\n          }\n          city_emplyoee[tz].push(employee.name);\n        });\n\n        var nemployeema=0;\n        for ( const key in city_emplyoee){\n             let ne=city_emplyoee[key].length;\n             if (ne>nemployeema){\n                nemployeema=ne;\n             }\n        }\n        cities=[];\n        for ( const key in city_emplyoee){\n             let ne=city_emplyoee[key].length;\n             if (ne==nemployeema){\n                cities.push(key);\n             }\n        }\n        if(cities.length==1)\n            return cities[0];\n        else\n            return cities[0];\n    }\n)[0]\n",
+            "sql_query_ref": "select city from (select address.city, count(*) as count from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id group by address.city order by count desc limit 1)",
+            "type": "count"
+        },
+        {
+            "question": "Provide the top 5 employee names in alphabetical order.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.map(employee=>{\n   return {\n      id:employee.id,\n      name:employee.name\n   }\n}).sort((a,b)=>a.name.localeCompare(b.name)).slice(0,5).map(value => value.name)\n",
+            "sql_query_ref": "select name from employees order by name asc limit 5",
+            "type": "count"
+        }
+    ]
+}

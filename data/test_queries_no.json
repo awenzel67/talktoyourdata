@@ -1,0 +1,180 @@
+{
+    "version": "0.0.1",
+    "data": [
+        {
+            "question": "Please give me the number of all clowns.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the birth place of all employees.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the fax number of all employees.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the addresses of employee Andreas Rivera.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\n      var result=data.employees.filter(\nemployee => {\n  return employee.name=='Andreas Rivera';\n}\n).map(employee => ({\n    street: employee.profile.contact.address.street,\n    city: employee.profile.contact.address.city\n    })\n    )\n",
+            "sql_query_ref": "select street, city from employees join profile on employees_id=employees.Id join contact on profile_id=profile.id join address on contact_id=contact.Id where employees.name='Andreas Rivera'",
+            "type": "count"
+        },
+        {
+            "question": "Please give me all project eyes.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "What is the smile of all projects.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Which employee has the project Incubate World-Class Schema.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return  project.name=='Incubate World-Class Schema';\n     } \n  ) \n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )    \n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id where projects.name='Incubate World-Class Schema'",
+            "type": "count"
+        },
+        {
+            "question": "Please give me the tasks descriptions of employee Jim Jarmusch",
+            "js_query_ref_type": "js",
+            "js_query_ref": "var all_tasks=[];var result=data.employees.filter(employee => employee.name=='Jim Jarmusch').map(employee => {employee.profile.projects.map(project=>{project.tasks.map(task=>{all_tasks.push(task.description)})})}); result=all_tasks;",
+            "sql_query_ref": "select tasks.description from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id where employees.name='Jim Jarmusch'",
+            "type": "count"
+        },
+        {
+            "question": "Which employee has Ente as primary skill in their project?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills && task.assignedTo.skills.primary === \"Ente\";\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id where skills.\"primary\"='Ente'",
+            "type": "count"
+        },
+        {
+            "question": "Which employees have Healthcare as tool in their project?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Which employees have Walter or SAP as domain experience in their project?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.domains && task.assignedTo.skills.experience.domains.some( domain => { return domain == \"Walter\" || domain == \"SAP\"});\n        });\n     } \n  )\n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select distinct employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id join domains on experience_id = experience.id  where domains.value in ('Walter','SAP')",
+            "type": "count"
+        },
+        {
+            "question": "Which employees have Healthcare and E-commerce as chairs in their project?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Which employees has a certificate updated before 1965-08-01",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(\nemployee => {\n  return employee.profile.projects.some( \n     project => {\n         return project.tasks.some(task => {\n            return task.assignedTo.skills.experience.certifications.meta && task.assignedTo.skills.experience.certifications.meta.lastUpdated<\"1965-08-01\";\n        });\n     } \n  ) \n}\n).map(employee => ({\n    id: employee.id,\n    name: employee.name\n    })\n    )\n",
+            "sql_query_ref": "select distinct employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id  join certifications on experience_id=experience.id join meta on certifications_id=certifications.id where lastUpdated<'1965-08-01'",
+            "type": "count"
+        },
+        {
+            "question": "Which employees have no experience?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=[0].map(\n    dummy => {\n        var pname = 0\n        data.employees.map(employee => {\n            employee.profile.projects.map(\n                project => {\n                    project.tasks.map(\n                        task => {\n                            if (task.assignedTo.skills.experience.years == pname) {\n                                pname = task.assignedTo.skills.experience.years\n                            }\n                        }\n                    )\n                }\n            )\n        })\n\n        var employeesFilter = data.employees.filter(\n            employee => {\n                return employee.profile.projects.some(\n                    project => {\n                        return project.tasks.some(task => {\n                            return task.assignedTo.skills.experience && task.assignedTo.skills.experience.years == pname;\n                        });\n                    }\n                )\n            }\n        ).map(employee => \n           {return {\n             \"id\":employee.id,\n             \"name\":employee.name\n           }}\n        )\n\n        return employeesFilter;\n    }\n)[0]\n",
+            "sql_query_ref": "select employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join experience on skills_id = skills.Id where experience.years=0",
+            "type": "count"
+        },
+        {
+            "question": "Which employees live north of 1000\u00b0?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "In wich different fun parks employees lives?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Wich animals have the same timezone?\n(use name only to identify animal)",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "What is the not existing domain experience?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the number of skills per user?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the employees ids and names having a skill in 'marmelade' and experience in DevOps.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "\nvar result=data.employees.filter(employee => {\n          return employee.profile.projects.some( \n             project => {\n                 return project.tasks.some(task => {\n                  if (task.assignedTo.skills.primary=='marmelade'){\n                     return true;\n                  }\n                  if (task.assignedTo.skills.secondary.includes('marmelade')){\n                     return true;\n                  }\n                  return false;\n                }) &&\n                project.tasks.some(task => {\n                   return task.assignedTo.skills.experience.domains && \n                   task.assignedTo.skills.experience.domains.some( domain => { return domain == \"DevOps\"});\n                });\n          });\n    }).map(employee => {\n       return {\n         \"id\": employee.id,\n         \"name\": employee.name\n       }\n    })   \n",
+            "sql_query_ref": "select employees.id, employees.name from employees join profile on employees_id=employees.Id join projects on profile_id=profile.id join tasks on projects_id=projects.id join assignedTo on tasks_id=tasks.id join skills on assignedTo_id=assignedTo.id join secondary on skills_id =skills.id where  (secondary.value='marmelade' or skills.\"primary\"='marmelade') and exists( select * from  experience join domains on experience_id=experience.id  where experience.skills_id=skills.id  and domains.value='DevOps')",
+            "type": "count"
+        },
+        {
+            "question": "Please give me the total number of devices.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Please give me the total color of projects for employees.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Wich employee is most Which employee is most profitable to the coordinates: 52.52437\u00b0",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "In wich cities most film stars live?",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        },
+        {
+            "question": "Give me the sorted list of task durations. Use only the first 5 results.",
+            "js_query_ref_type": "js",
+            "js_query_ref": "",
+            "sql_query_ref": "",
+            "type": "no-tool-call"
+        }
+    ]
+}
