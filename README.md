@@ -1,6 +1,6 @@
 # Talk to your data
 
-This repository contains sample code in different notebooks covering the thema of querying local data in SQL databases or JSON files. 
+This repository contains sample code in different notebooks covering the thema of querying local data in SQL databases or JSON files with natural language using AI Agents. 
 
 The corresponding sample data and test cases can be found in folder data.
 
