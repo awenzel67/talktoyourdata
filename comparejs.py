@@ -1,4 +1,5 @@
 from flatten_json import flatten
+#from sqlalchemy import false
 def normalize(a):
     if not type(a) is list:
         return a
@@ -55,6 +56,45 @@ def colsAreEqual(a,b):
         if not compareToRef(ae,be):
             return False
     return True
+
+
+def get_arrays_from_key(a: list):
+    ret={}
+    for ele in a:
+       if not type(ele) is dict:
+           return None
+       for rkey in ele.keys():
+           if rkey in ret:
+                    ret[rkey].append(ele[rkey]);
+           else:
+                ret[rkey]=[ele[rkey]]
+    return ret
+
+def compare_arrays_weak(a:list,b:list):
+    if len(a)!=len(b):
+        return False
+    if(len(b)==0):
+        return len(a)==0
+    if not type(b[0]) is dict:
+        return False
+    if  type(a[0]) is dict:
+        return False
+    if  type(a[0]) is list:
+        return False
+    a.sort()
+    cols=get_arrays_from_key(b)
+    for col in cols.keys():
+        rfa=cols[col]
+        rfa.sort()
+        isEqual=True
+        for irow in range(len(a)):
+            if a[irow]!=rfa[irow]:
+                isEqual=False   
+        if isEqual:
+            return True
+    return False
+
+
 
 
 def correctArrayInArray(myarray):
@@ -141,6 +181,22 @@ def objectsAreEqual(a: dict,ref: dict):
     else:
         return objectsAreEqualNonFlat(a,ref)
     
+
+def value_is_in_ref(value,ref):
+    if type(value)==list:
+        return False
+    if type(dict)==dict:
+        return False
+    if not type(ref)==dict:
+        return False
+    for aokey in ref.keys():
+        aovalue=ref[aokey]
+        if (not type(aovalue)==dict) and (not type(aovalue)==list):
+          if  value==aovalue:
+              return True
+    return False
+
+
 def extractCols(array):
     if not type(array)==list:
         return None
@@ -183,6 +239,8 @@ def compareToRef(ao: any, refo: any):
               if len(refo)==1:
                   if type(ao)==type(refo[0]):
                       return compareToRef(ao,refo[0])
+                  elif value_is_in_ref(ao,refo[0]):
+                      return True
 
               #print(type(ao))
               #print("No List: "+str(ao))
@@ -198,12 +256,24 @@ def compareToRef(ao: any, refo: any):
                     #print('llll')
                     cvalues=extractCols(ao2)
                     if cvalues!=None:
-                        return compare_multi_cols(cvalues,refo2)          
+                        return compare_multi_cols(cvalues,refo2)
+                elif len(refo2)>0 and type(refo2[0]) == dict and type(ao2[0])!=dict and type(ao2[0])!=list:
+                        return  compare_arrays_weak(ao2,refo2)
                 return colsAreEqual(ao2,refo2)
     elif type(refo) is dict:
         if not type(ao) is dict:
               if type(ao) is list and len(ao)==1:
-                  return objectsAreEqual(ao[0],refo)     
+                  if type(ao[0])==dict:
+                    return objectsAreEqual(ao[0],refo)
+                  elif type(ao[0])==list:
+                    return False
+                  else:
+                    return value_is_in_ref(ao[0],refo)
+              elif type(ao)==list:
+                    return False
+              else:
+                  return value_is_in_ref(ao,refo)
+
               #print("No dict"+str(ao))
               return False
         else:
@@ -257,7 +327,42 @@ def compareGroupToRef(ao: any, refo: any):
             return False
     return True        
 
+def testCompareToRef2():
+    a1='Shannon Curtis'
+    aref=[{'id': 'E00001', 'name': 'Shannon Curtis'}]
+    copo=compareToRef(a1,aref)
+    if copo != True:
+        return False
+    return True
+
 def testCompareToRef():
+
+    if (not testCompareToRef2()):
+        return False
+
+    a1=None
+    aref= None
+    copo=compareToRef(a1,aref)
+    if copo != True:
+        return False
+
+    copo=compareToRef(a1,aref)
+    if copo != True:
+        return False
+
+    a1="Eileen Fitzgerald"
+    aref={'id': 'E00006', 'name': 'Eileen Fitzgerald'}
+
+    copo=compareToRef(a1,aref)
+    if copo != True:
+        return False
+
+    a1 = ['Shannon Curtis', 'Eileen Fitzgerald', 'Ashley Arroyo', 'Thomas Santiago', 'Christopher Thompson', 'Julie Patterson', 'Brenda Wang', 'David Taylor', 'Sherry Yates', 'Anthony Jefferson', 'Toni Sanchez', 'Brett Guzman', 'Jasmine Sutton', 'David Smith', 'Cheryl Lee', 'Holly Hill', 'Jason Powell', 'Sarah Moore', 'Isaiah Gonzalez', 'Matthew Caldwell', 'Jeffrey Johnson', 'Terry Elliott', 'Christopher Evans', 'Robert Kelley', 'Jeffrey Cruz', 'Sandra Davis', 'James Garza', 'Ashley Miller', 'Daniel Mueller', 'Emily Riddle', 'Stephanie Smith', 'Rebecca King', 'Cheryl Scott', 'Anthony Whitehead', 'Edward Jenkins', 'Christopher Alvarado', 'Colleen Poole', 'Tonya Wang', 'Michael Perry', 'Ruben Hancock', 'Timothy Haynes', 'Jon Harper', 'Amber Anderson', 'Theresa Frazier', 'Mario Lloyd', 'Melissa Edwards', 'Joshua Joseph', 'Elizabeth Price', 'Duane Aguilar', 'Javier York', 'Benjamin Watson', 'April Cline', 'Elizabeth Spence', 'Miranda Cole', 'Lucas Wagner', 'Robert Johnson', 'Mary Buck', 'Shawn Bowen', 'Robert Mccall', 'Martin Roberts', 'Jeff Wilkerson', 'Amanda Luna', 'Amanda Daniels', 'Gerald Ross', 'Amy Pollard', 'Lisa Griffin', 'Katherine Becker', 'Christina Colon', 'Eric Jones', 'Julie Brown', 'Timothy Mullins']
+    aref=[{'id': 'E00001', 'name': 'Shannon Curtis'}, {'id': 'E00006', 'name': 'Eileen Fitzgerald'}, {'id': 'E00009', 'name': 'Ashley Arroyo'}, {'id': 'E00012', 'name': 'Thomas Santiago'}, {'id': 'E00013', 'name': 'Christopher Thompson'}, {'id': 'E00021', 'name': 'Julie Patterson'}, {'id': 'E00023', 'name': 'Brenda Wang'}, {'id': 'E00024', 'name': 'David Taylor'}, {'id': 'E00026', 'name': 'Sherry Yates'}, {'id': 'E00027', 'name': 'Anthony Jefferson'}, {'id': 'E00028', 'name': 'Toni Sanchez'}, {'id': 'E00031', 'name': 'Brett Guzman'}, {'id': 'E00033', 'name': 'Jasmine Sutton'}, {'id': 'E00035', 'name': 'David Smith'}, {'id': 'E00036', 'name': 'Cheryl Lee'}, {'id': 'E00042', 'name': 'Holly Hill'}, {'id': 'E00044', 'name': 'Jason Powell'}, {'id': 'E00048', 'name': 'Sarah Moore'}, {'id': 'E00054', 'name': 'Isaiah Gonzalez'}, {'id': 'E00056', 'name': 'Matthew Caldwell'}, {'id': 'E00057', 'name': 'Jeffrey Johnson'}, {'id': 'E00058', 'name': 'Terry Elliott'}, {'id': 'E00066', 'name': 'Christopher Evans'}, {'id': 'E00068', 'name': 'Robert Kelley'}, {'id': 'E00071', 'name': 'Jeffrey Cruz'}, {'id': 'E00077', 'name': 'Sandra Davis'}, {'id': 'E00078', 'name': 'James Garza'}, {'id': 'E00081', 'name': 'Ashley Miller'}, {'id': 'E00082', 'name': 'Daniel Mueller'}, {'id': 'E00085', 'name': 'Emily Riddle'}, {'id': 'E00086', 'name': 'Stephanie Smith'}, {'id': 'E00087', 'name': 'Rebecca King'}, {'id': 'E00088', 'name': 'Cheryl Scott'}, {'id': 'E00090', 'name': 'Anthony Whitehead'}, {'id': 'E00091', 'name': 'Edward Jenkins'}, {'id': 'E00092', 'name': 'Christopher Alvarado'}, {'id': 'E00096', 'name': 'Colleen Poole'}, {'id': 'E00097', 'name': 'Tonya Wang'}, {'id': 'E00099', 'name': 'Michael Perry'}, {'id': 'E00102', 'name': 'Ruben Hancock'}, {'id': 'E00103', 'name': 'Timothy Haynes'}, {'id': 'E00107', 'name': 'Jon Harper'}, {'id': 'E00110', 'name': 'Amber Anderson'}, {'id': 'E00121', 'name': 'Theresa Frazier'}, {'id': 'E00125', 'name': 'Mario Lloyd'}, {'id': 'E00127', 'name': 'Melissa Edwards'}, {'id': 'E00129', 'name': 'Joshua Joseph'}, {'id': 'E00134', 'name': 'Elizabeth Price'}, {'id': 'E00135', 'name': 'Duane Aguilar'}, {'id': 'E00145', 'name': 'Javier York'}, {'id': 'E00146', 'name': 'Benjamin Watson'}, {'id': 'E00147', 'name': 'April Cline'}, {'id': 'E00150', 'name': 'Elizabeth Spence'}, {'id': 'E00155', 'name': 'Miranda Cole'}, {'id': 'E00158', 'name': 'Lucas Wagner'}, {'id': 'E00159', 'name': 'Robert Johnson'}, {'id': 'E00161', 'name': 'Mary Buck'}, {'id': 'E00163', 'name': 'Shawn Bowen'}, {'id': 'E00165', 'name': 'Robert Mccall'}, {'id': 'E00166', 'name': 'Martin Roberts'}, {'id': 'E00169', 'name': 'Jeff Wilkerson'}, {'id': 'E00171', 'name': 'Amanda Luna'}, {'id': 'E00177', 'name': 'Amanda Daniels'}, {'id': 'E00179', 'name': 'Gerald Ross'}, {'id': 'E00180', 'name': 'Amy Pollard'}, {'id': 'E00183', 'name': 'Lisa Griffin'}, {'id': 'E00193', 'name': 'Katherine Becker'}, {'id': 'E00194', 'name': 'Christina Colon'}, {'id': 'E00196', 'name': 'Eric Jones'}, {'id': 'E00197', 'name': 'Julie Brown'}, {'id': 'E00200', 'name': 'Timothy Mullins'}]
+    copo=compareToRef(a1,aref)
+    if copo != True:
+        return False
+
     a1=['Port James']
     aref='Port James'
     copo=compareToRef(a1,aref)
@@ -326,3 +431,6 @@ def testCompareToRef():
         return False 
     
     return True
+
+testr=testCompareToRef()
+print(testr)
